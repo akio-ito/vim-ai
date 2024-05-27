@@ -81,7 +81,10 @@ try:
         def map_chunk(resp):
             printDebug("[chat] response: {}", resp)
             return resp['choices'][0]['delta'].get('content', '')
-        text_chunks = map(map_chunk, response)
+        if "api.groq.com" in url:
+             text_chunks = response
+        else:
+            text_chunks = map(map_chunk, response)
         render_text_chunks(text_chunks, is_selection)
 
         vim.command("normal! a\n\n>>> user\n\n")

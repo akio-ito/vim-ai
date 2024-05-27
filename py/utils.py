@@ -10,6 +10,7 @@ import socket
 import re
 from urllib.error import URLError
 from urllib.error import HTTPError
+from groq import Groq
 import traceback
 import configparser
 
@@ -211,6 +212,15 @@ def openai_request(url, data, options):
         if OPENAI_ORG_ID is not None:
             headers["OpenAI-Organization"] =  f"{OPENAI_ORG_ID}"
 
+    if "api.groq.com" in url:
+        client = Groq(
+            api_key=os.environ.get("GROQ_API_KEY"),
+        )
+        if "stream" in data:
+            del data["stream"]
+        chat_completion = client.chat.completions.create(**data)
+        yield chat_completion.choices[0].message.content
+        return
     request_timeout=options['request_timeout']
     req = urllib.request.Request(
         url,
